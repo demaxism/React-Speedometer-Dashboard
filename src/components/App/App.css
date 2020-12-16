@@ -12,6 +12,12 @@ button {
   cursor: pointer;
 }
 
+.blueBtn {
+  border: 1px;
+  padding: 5px;
+  background-color: lightblue;
+}
+
 ul {
   display: flex;
   padding: 0;

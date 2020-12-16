@@ -1,5 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Instructions from '../Instructions/Instructions';
+import Meter from '../Meter/Meter';
+import Drawer from '../Drawer/Drawer';
 import './App.css';
 
 const displayEmojiName = event => alert(event.target.id);
@@ -21,11 +23,16 @@ const emojis = [
 function App() {
   const greeting = "greeting";
   const displayAction = false;
+  let memberCount = 0;
+
+  const [count, setCount] = useState(0);
+
   return(
     <div className="container">
       <h1 id={greeting}>Hello, World</h1>
       {displayAction && <p>I am writing JSX</p>}
-      <Instructions/>
+      <Instructions cname='demax'/>
+      <Drawer />
       <ul>
         {
           emojis.map(emoji => (
@@ -39,6 +46,10 @@ function App() {
           ))
         }
       </ul>
+      <p>count: {count} times.</p>
+      <button onClick={ ()=> setCount(count + 1)}>click me</button>
+      <p>memberCount: {memberCount}</p>
+      <button className='blueBtn' onClick={ ()=> memberCount = memberCount + 1 }>M_Click</button>
     </div>
   )
 }

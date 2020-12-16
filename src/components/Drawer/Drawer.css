@@ -1,0 +1,14 @@
+.instructions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.instructions img {
+  width: 100px;
+  height: 100px;
+}
+
+.counterText {
+  fill: rgb(255, 255, 255); font-size: 50px;
+}
