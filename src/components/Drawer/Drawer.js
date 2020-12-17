@@ -7,20 +7,17 @@ export default class Drawer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      speed : 10
+      speed : 1,
+      count : 0,
     }
   }
 
   componentDidMount() {
-    var percent = 65;
-    var oldValue=0;
-    var ratio=percent/100;
-    var glowRadius = 25;
 
     var outerRadius=150;
     var innerRadius=outerRadius - 12;
     var cornerRadius = 3;
-    var gap = 0.01;
+    var gap = 0.0;
 
     var limit = 65;
 
@@ -32,20 +29,20 @@ export default class Drawer extends Component {
     var svg=d3.select('#svg-g');
 
     // back arc
-    var rail1=d3.svg.arc()
+    var rail1 = d3.svg.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
       .cornerRadius(0)
       .startAngle(startAngle).endAngle(limitAngle - gap);
 
-    var pathBackground=svg.append('path')
-      .attr({
-          d:rail1
-      })
-      .style({
-          fill:'url(#grayGradient)',
-          filter: 'url(#shadow)'
-      });
+    d3.select('#svg-back').append('path')
+    .attr({
+        d:rail1
+    })
+    .style({
+        fill:'url(#grayGradient)',
+        filter: 'url(#shadow)'
+    });
 
     var rail2 = d3.svg.arc()
       .innerRadius(innerRadius)
@@ -54,15 +51,13 @@ export default class Drawer extends Component {
       .startAngle(function(d) { return d.startAngle; })
       .endAngle(function(d) { return d.endAngle; });
 
-    var steps = 5;
+    var steps = 3;
     var rail2Angle = (endAngle - limitAngle) * 180 / Math.PI; // ~~ 90
     var fadeStart = 40;
     var fadeStep = 0.0012;
     var data = d3.range(rail2Angle / steps).map(function(d, i) {
       console.log(i);
       var pass = i * steps;
-      console.log(" s:" + (limitAngle + pass * (Math.PI / 180)));
-      console.log(" e:" + (limitAngle + (pass + steps) * (Math.PI / 180)));
       return {
         flag: i,
         startAngle: limitAngle + pass * (Math.PI / 180),
@@ -71,7 +66,7 @@ export default class Drawer extends Component {
       };
     });
 
-    svg.selectAll("path")
+    d3.select('#svg-back').selectAll("path")
       .data(data)
       .enter()
       .append("path")
@@ -81,33 +76,102 @@ export default class Drawer extends Component {
       .attr("stroke", function(d) { return d.fill;})
       .attr("fill", function(d) { return d.fill; });
 
-    // red arc
-    var arcLine=d3.svg.arc()
+    // fan shade
+    var fanStep = 3;
+    var fanRange = 30;
+    var percentAngle = startAngle + (this.state.speed - 0.2) / 100 * (endAngle - startAngle);
+    var fan = d3.svg.arc()
+      .innerRadius(innerRadius * 0.7)
+      .outerRadius(innerRadius)
+      .startAngle(function(d) { return d.startAngle; })
+      .endAngle(function(d) { return d.endAngle; });
+
+    var fanData = ()=> {
+      return d3.range(fanRange).map(function(d, i) {
+        var pass = i * fanStep;
+        return {
+          startAngle: percentAngle - pass * (Math.PI / 180),
+          endAngle:Math.max(startAngle, percentAngle - (pass + fanStep) * (Math.PI / 180)),
+          fill: d3.hsl(200, 0.8, 0.2 - i * 0.007).toString()
+        }
+      });
+    }
+
+    var drawFan = () => {
+      d3.select('#svg-fan').selectAll("path")
+      .data(fanData())
+      .enter()
+      .append("path")
+      .attr('d', fan)
+      .attr("stroke-width", 1)
+      .attr("stroke", function(d) { return d.fill;})
+      .attr("fill", function(d) { return d.fill; });
+    }
+    drawFan();
+
+    // arc
+    var arcLine = d3.svg.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
-      .cornerRadius(4)
-      .startAngle(startAngle).endAngle(-0.3 * Math.PI);
+      .cornerRadius(3)
+      .startAngle(startAngle).endAngle(startAngle + this.state.speed / 100 * (endAngle - startAngle));
 
-    var pathForeground=svg.append('path')
+    var speedIndicator = d3.select('#svg-g').append('path')
     .datum({endAngle:0})
     .attr({
         d: arcLine,
         id: 'arcguide'
     })
     .style({
-      // fill: '#f14254',
       fill:'url(#gradient)',
       filter: 'url(#dropGlow)',
     });
-    
-    pathForeground.endAngle = 3.5;
 
+    var drawSpeedIndct = () => {
+      d3.select('#svg-g').append('path')
+      .datum({endAngle:0})
+      .attr({
+          d: arcLine,
+          id: 'arcguide'
+      })
+      .style({
+        fill:'url(#gradient)',
+        filter: 'url(#dropGlow)',
+      });
+    }
+    drawSpeedIndct();
+
+    var update = () => {
+      this.setState({count : this.state.count + 1});
+
+      if (this.state.speed < 100) {
+        this.setState({ speed : this.state.speed + 0.5 });
+        var angle = startAngle + this.state.speed / 100 * (endAngle - startAngle);
+        d3.select('#svg-g').selectAll("path").remove();
+        arcLine.endAngle(angle);
+        drawSpeedIndct();
+
+        d3.select('#svg-fan').selectAll("path").remove();
+        percentAngle = startAngle + (this.state.speed - 0.2) / 100 * (endAngle - startAngle);
+        drawFan();
+      }
+      
+      // console.log("update " + this.state.count);
+      window.requestAnimationFrame(update);
+    }
+    update();
   }
 
   render() {
     return (
       <div id='chart'>
         <svg width="700" height="400">
+          <g transform="translate(350,200)" id="svg-back">
+
+          </g>
+          <g transform="translate(350,200)" id="svg-fan">
+
+          </g>
           <g transform="translate(350,200)" id="svg-g">
             <defs>
               <filter id="shadow">
@@ -123,16 +187,16 @@ export default class Drawer extends Component {
                 <stop offset="100%" stop-color="#000000"></stop>
               </radialGradient>
               <linearGradient id="gradient" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#CA011F"></stop>
-                  <stop offset="100%" stop-color="#f14254"></stop>
+                  <stop offset="0%" stop-color="#c9dcff"></stop>
+                  <stop offset="100%" stop-color="#e8f0ff"></stop>
               </linearGradient>
               <filter id="dropGlow" height="3100%" width="3100%">
                 <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/>
                 <feColorMatrix
                 type = "matrix"
-                values="0.95     0     0     0     0
-                        0     0.26     0     0     0
-                        0     0     0.33     0     0
+                values="0.55     0     0     0     0
+                        0     0.71     0     0     0
+                        0     0     1     0     0
                         0     0     0     1     0 "/>
                 <feOffset in="bluralpha" dx="0.000000" dy="0.000000" result="offsetBlur"/>
                 <feMerge>
@@ -140,13 +204,32 @@ export default class Drawer extends Component {
                     <feMergeNode in="SourceGraphic"/>
                 </feMerge>
               </filter>
+              <linearGradient id="gradientHigh" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#fdff9c"></stop>
+                  <stop offset="100%" stop-color="#feffcc"></stop>
+              </linearGradient>
+              <filter id="dropGlowHigh" height="3100%" width="3100%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/>
+                <feColorMatrix
+                type = "matrix"
+                values="1     0     0     0     0
+                        0     0.9     0     0     0
+                        0     0     0.5    0     0
+                        0     0     0     1     0 "/>
+                <feOffset in="bluralpha" dx="0.000000" dy="0.000000" result="offsetBlurHigh"/>
+                <feMerge>
+                    <feMergeNode in="offsetBlurHigh"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
               <filter id="softGlow" height="100" width="100" x="-1000%" y="-1000%">
                 <feGaussianBlur in="SourceGraphic" stdDeviation="20"></feGaussianBlur>
               </filter>
             </defs>
-            <circle r="25" id="glowMarker" fill="#eb384b" filter="url(#softGlow)"></circle>
-            <text class="counterText" text-anchor="middle" alignment-baseline="middle">{this.state.speed}</text>
+            <circle r="25" id="glowMarker" fill="#c9dcff" filter="url(#softGlow)"></circle>
+            <text class="counterText" text-anchor="middle" alignment-baseline="middle">{Math.round(this.state.speed)}</text>
           </g>
+          
         </svg>
       </div>
     )
