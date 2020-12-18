@@ -7,13 +7,19 @@ export default class Drawer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      speed : 1,
+      speed : 0,
       count : 0,
     }
   }
 
+  componentWillReceiveProps(props) {
+    this.setState({ speed : props.speedInput});
+    console.log(' receive:' + this.state.speed);
+  }
+
   componentDidMount() {
 
+    let self = this;
     var outerRadius=150;
     var innerRadius=outerRadius - 12;
     var cornerRadius = 3;
@@ -25,8 +31,6 @@ export default class Drawer extends Component {
     var endAngle = 0.75 * Math.PI;
     var limitAngle = limit / 100 * (endAngle - startAngle) + startAngle;
     console.log(" a " + limitAngle);
-
-    var svg=d3.select('#svg-g');
 
     // back arc
     var rail1 = d3.svg.arc()
@@ -89,10 +93,11 @@ export default class Drawer extends Component {
     var fanData = ()=> {
       return d3.range(fanRange).map(function(d, i) {
         var pass = i * fanStep;
+        var h = (self.state.speed < limit) ? 200 : 45;
         return {
           startAngle: percentAngle - pass * (Math.PI / 180),
           endAngle:Math.max(startAngle, percentAngle - (pass + fanStep) * (Math.PI / 180)),
-          fill: d3.hsl(200, 0.8, 0.2 - i * 0.007).toString()
+          fill: d3.hsl(h, 0.8, 0.2 - i * 0.007).toString()
         }
       });
     }
@@ -116,18 +121,8 @@ export default class Drawer extends Component {
       .cornerRadius(3)
       .startAngle(startAngle).endAngle(startAngle + this.state.speed / 100 * (endAngle - startAngle));
 
-    var speedIndicator = d3.select('#svg-g').append('path')
-    .datum({endAngle:0})
-    .attr({
-        d: arcLine,
-        id: 'arcguide'
-    })
-    .style({
-      fill:'url(#gradient)',
-      filter: 'url(#dropGlow)',
-    });
-
     var drawSpeedIndct = () => {
+
       d3.select('#svg-g').append('path')
       .datum({endAngle:0})
       .attr({
@@ -135,8 +130,8 @@ export default class Drawer extends Component {
           id: 'arcguide'
       })
       .style({
-        fill:'url(#gradient)',
-        filter: 'url(#dropGlow)',
+        fill: (this.state.speed < limit) ? 'url(#gradient)' : 'url(#gradientHigh)',
+        filter: (this.state.speed < limit) ? 'url(#dropGlow)' : 'url(#dropGlowHigh)',
       });
     }
     drawSpeedIndct();
@@ -146,6 +141,7 @@ export default class Drawer extends Component {
 
       if (this.state.speed < 100) {
         this.setState({ speed : this.state.speed + 0.5 });
+
         var angle = startAngle + this.state.speed / 100 * (endAngle - startAngle);
         d3.select('#svg-g').selectAll("path").remove();
         arcLine.endAngle(angle);
@@ -159,7 +155,7 @@ export default class Drawer extends Component {
       // console.log("update " + this.state.count);
       window.requestAnimationFrame(update);
     }
-    update();
+    //update();
   }
 
   render() {
