@@ -14,10 +14,10 @@ export default class DriveStateIcon extends Component {
   }
 
   componentWillReceiveProps(props) {
-    var driveStateMap = {
+    let driveStateMap = {
       0: "R", 1: "N", 2: "D", 3: "P", 4: "B"
     }
-    var stateChar = driveStateMap[props.currentState];
+    let stateChar = driveStateMap[props.currentState];
 
     if (this.state.stateName === stateChar) {
       this.setState({ isEnabled : true});

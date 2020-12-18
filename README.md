@@ -1,8 +1,17 @@
-# creation
-npx create-react-app my-app
+# Speed meter demo project
+This project demonstrates a speedometer as a reusable component.
 
-# run 
-npm start
+# Environment
+Node version v12.20.0
+This is a React project.
 
-# react Hook
-when use function component, since function is stateless, we need some way to memo states, Hook is similar to Class's member property.
+# Install
+`npm install`
+
+# Run 
+`npm start`
+and access localhost:3000 in browser.
+
+
+# Limitation
+The transition animation of the speed indicator arc is not perfectly smooth due to drawing large amount of svg arcs each frame, this could be improved by using arcTween().

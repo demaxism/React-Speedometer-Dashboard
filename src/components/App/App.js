@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import Instructions from '../Instructions/Instructions';
-import Meter from '../Meter/Meter';
 import SpeedIndicator from '../SpeedIndicator/SpeedIndicator';
 import './App.css';
 
@@ -61,7 +60,7 @@ export default class App extends Component {
   render() {
     return (
       <div className="container">
-        <h1 id={this.state.greeting}>Hello, World</h1>
+        <h1>Speedometer Demo</h1>
         <Instructions cname='demax'/>
         <SpeedIndicator speedInput={this.state.speed} driveStateInput={this.state.driveStateNum} />
       </div>

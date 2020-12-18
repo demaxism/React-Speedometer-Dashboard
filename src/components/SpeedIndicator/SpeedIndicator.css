@@ -10,11 +10,17 @@
 }
 
 .counterText {
-  fill: rgb(255, 255, 255); font-size: 50px;
+  fill: rgb(255, 255, 255); font-size: 60px;
+}
+
+.tipText {
+  fill: rgb(255, 255, 255); font-size: 20px;
+  transform: translateY(40px);
 }
 
 #chart {
   position: relative;
+  background-color: black;
 }
 
 .driveStates {

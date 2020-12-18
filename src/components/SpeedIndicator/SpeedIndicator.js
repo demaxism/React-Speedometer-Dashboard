@@ -25,16 +25,15 @@ export default class SpeedIndicator extends Component {
   componentDidMount() {
 
     let self = this;
-    var outerRadius=150;
-    var innerRadius=outerRadius - 12;
-    var cornerRadius = 3;
-    var gap = 0.0;
 
-    var limit = 65;
+    const limit = 65; // speed limit of 65 MPH
+    const outerRadius=150;
+    const innerRadius=outerRadius - 12;
+    const gap = 0.0;
 
-    var startAngle = -0.75 * Math.PI;
-    var endAngle = 0.75 * Math.PI;
-    var limitAngle = limit / 100 * (endAngle - startAngle) + startAngle;
+    const startAngle = -0.75 * Math.PI;
+    const endAngle = 0.75 * Math.PI;
+    const limitAngle = limit / 100 * (endAngle - startAngle) + startAngle;
 
     // Arc rail of the speed indicator (the grey arc)
     // The arc rail before the speed limit
@@ -86,16 +85,16 @@ export default class SpeedIndicator extends Component {
       .attr("fill", function(d) { return d.fill; });
 
     // Shadow fan of the speed indicator
-    var fanStep = 3;
-    var fanRange = 30;
-    var percentAngle = startAngle + (this.state.speed + 0.8) / 100 * (endAngle - startAngle);
-    var fan = d3.svg.arc()
+    const fanStep = 3;
+    const fanRange = 30;
+    let percentAngle = startAngle + (this.state.speed + 0.8) / 100 * (endAngle - startAngle);
+    let fan = d3.svg.arc()
       .innerRadius(innerRadius * 0.7)
       .outerRadius(innerRadius)
       .startAngle(function(d) { return d.startAngle; })
       .endAngle(function(d) { return d.endAngle; });
 
-    var fanData = ()=> {
+    let fanData = ()=> {
       return d3.range(fanRange).map(function(d, i) {
         var pass = i * fanStep;
         var h = (self.state.speed < limit) ? 200 : 45;
@@ -107,7 +106,7 @@ export default class SpeedIndicator extends Component {
       });
     }
 
-    var drawFan = () => {
+    let drawFan = () => {
       d3.select('#svg-fan').selectAll("path")
       .data(fanData())
       .enter()
@@ -120,13 +119,13 @@ export default class SpeedIndicator extends Component {
     drawFan();
 
     // The speed indicator arc
-    var arcLine = d3.svg.arc()
+    let arcLine = d3.svg.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
       .cornerRadius(3)
       .startAngle(startAngle).endAngle(startAngle + (this.state.speed + 1) / 100 * (endAngle - startAngle));
 
-    var drawSpeedIndct = () => {
+    let drawSpeedIndct = () => {
 
       d3.select('#svg-g').append('path')
       .datum({endAngle:0})
@@ -144,7 +143,7 @@ export default class SpeedIndicator extends Component {
     this.update = () => {
       if (this.state.speed <= 100 && this.state.speed >= 0) {
         // update speed indicator arc
-        var angle = startAngle + (this.state.speed + 1) / 100 * (endAngle - startAngle);
+        let angle = startAngle + (this.state.speed + 1) / 100 * (endAngle - startAngle);
         d3.select('#svg-g').selectAll("path").remove();
         arcLine.endAngle(angle);
         drawSpeedIndct();
@@ -155,15 +154,15 @@ export default class SpeedIndicator extends Component {
         drawFan();
 
         // update highlight
-        var marker = d3.select('#glowMarker');
+        let marker = d3.select('#glowMarker');
         if (this.state.speed < limit) {
           marker.attr('display', "none");
         }
         else {
           marker.attr('display', "block");
-          var r = (innerRadius + outerRadius) / 2.0;
-          var x = r * Math.sin(angle);
-          var y = -r * Math.cos(angle);
+          let r = (innerRadius + outerRadius) / 2.0;
+          let x = r * Math.sin(angle);
+          let y = -r * Math.cos(angle);
           marker.attr('transform', `translate(${x}, ${y})`);
         }
       }
@@ -237,6 +236,7 @@ export default class SpeedIndicator extends Component {
             </defs>
             <circle r="25" id="glowMarker" fill="#ffe063" filter="url(#softGlow)" display="none"></circle>
             <text class="counterText" text-anchor="middle" alignment-baseline="middle">{Math.round(this.state.speed)}</text>
+            <text class="tipText" text-anchor="middle" alignment-baseline="middle">MPH</text>
           </g>
           <g id="driveStateCont">
             
