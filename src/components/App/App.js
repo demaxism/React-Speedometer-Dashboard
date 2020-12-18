@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Instructions from '../Instructions/Instructions';
 import Meter from '../Meter/Meter';
-import Drawer from '../Drawer/Drawer';
+import SpeedIndicator from '../SpeedIndicator/SpeedIndicator';
 import './App.css';
 
 export default class App extends Component {
@@ -11,11 +11,13 @@ export default class App extends Component {
     this.state = {
       speed : 0,
       count : 0,
+      driveStateNum : 2,
       isAcc : false
     }
   }
 
   componentDidMount() {
+
     document.addEventListener('keydown', (event) => {
       if (event.key === ' ') {
         this.setState({ isAcc : true });
@@ -25,6 +27,16 @@ export default class App extends Component {
       if (event.key === ' ') {
         this.setState({ isAcc : false });
       }
+      else if (event.keyCode == '38' ) {
+        if (this.state.driveStateNum > 0) {
+          this.setState({driveStateNum: this.state.driveStateNum - 1});
+        }
+      } // up arrow
+      else if (event.keyCode == '40' ) {
+        if (this.state.driveStateNum < 4) {
+          this.setState({driveStateNum: this.state.driveStateNum + 1});
+        }
+      } // down arrow
     });
 
     var update = () => {
@@ -42,6 +54,8 @@ export default class App extends Component {
       window.requestAnimationFrame(update);
     }
     update();
+
+    this.setState({driveStateNum: 2});
   }
 
   render() {
@@ -49,7 +63,7 @@ export default class App extends Component {
       <div className="container">
         <h1 id={this.state.greeting}>Hello, World</h1>
         <Instructions cname='demax'/>
-        <Drawer speedInput={this.state.speed} />
+        <SpeedIndicator speedInput={this.state.speed} driveStateInput={this.state.driveStateNum} />
       </div>
     );
   }

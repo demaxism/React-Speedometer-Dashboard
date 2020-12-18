@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
-import './Drawer.css';
+import './SpeedIndicator.css';
+import '../DriveStateIcon/DriveStateIcon';
+import DriveStateIcon from '../DriveStateIcon/DriveStateIcon';
 let d3 = window.d3;
 
-export default class Drawer extends Component {
+export default class SpeedIndicator extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
       speed : 0,
+      driveState : 0,
       count : 0,
     }
     this.update = null;
@@ -15,6 +18,7 @@ export default class Drawer extends Component {
 
   componentWillReceiveProps(props) {
     this.setState({ speed : props.speedInput});
+    this.setState({ driveState : props.driveStateInput});
     this.update();
   }
 
@@ -31,7 +35,6 @@ export default class Drawer extends Component {
     var startAngle = -0.75 * Math.PI;
     var endAngle = 0.75 * Math.PI;
     var limitAngle = limit / 100 * (endAngle - startAngle) + startAngle;
-    console.log(" a " + limitAngle);
 
     // Arc rail of the speed indicator (the grey arc)
     // The arc rail before the speed limit
@@ -63,7 +66,6 @@ export default class Drawer extends Component {
     var fadeStart = 40;
     var fadeStep = 0.0012;
     var data = d3.range(rail2Angle / steps).map(function(d, i) {
-      console.log(i);
       var pass = i * steps;
       return {
         flag: i,
@@ -141,23 +143,35 @@ export default class Drawer extends Component {
 
     this.update = () => {
       if (this.state.speed <= 100 && this.state.speed >= 0) {
+        // update speed indicator arc
         var angle = startAngle + (this.state.speed + 1) / 100 * (endAngle - startAngle);
         d3.select('#svg-g').selectAll("path").remove();
         arcLine.endAngle(angle);
         drawSpeedIndct();
 
+        // update shadow fan
         d3.select('#svg-fan').selectAll("path").remove();
         percentAngle = startAngle + (this.state.speed + 0.8) / 100 * (endAngle - startAngle);
         drawFan();
+
+        // update highlight
+        var marker = d3.select('#glowMarker');
+        if (this.state.speed < limit) {
+          marker.attr('display', "none");
+        }
+        else {
+          marker.attr('display', "block");
+          var r = (innerRadius + outerRadius) / 2.0;
+          var x = r * Math.sin(angle);
+          var y = -r * Math.cos(angle);
+          marker.attr('transform', `translate(${x}, ${y})`);
+        }
       }
-      
-      // console.log("update " + this.state.count);
-      //window.requestAnimationFrame(self.update);
     }
-    //update();
   }
 
   render() {
+
     return (
       <div id='chart'>
         <svg width="700" height="400">
@@ -221,11 +235,19 @@ export default class Drawer extends Component {
                 <feGaussianBlur in="SourceGraphic" stdDeviation="20"></feGaussianBlur>
               </filter>
             </defs>
-            <circle r="25" id="glowMarker" fill="#c9dcff" filter="url(#softGlow)"></circle>
+            <circle r="25" id="glowMarker" fill="#ffe063" filter="url(#softGlow)" display="none"></circle>
             <text class="counterText" text-anchor="middle" alignment-baseline="middle">{Math.round(this.state.speed)}</text>
+          </g>
+          <g id="driveStateCont">
+            
           </g>
           
         </svg>
+        <div class="driveStates" style={{left:"160px", top:"80px"}}><DriveStateIcon stateName="R" currentState={this.state.driveState} /></div>
+        <div class="driveStates" style={{left:"134px", top:"125px"}}><DriveStateIcon stateName="N" currentState={this.state.driveState} /></div>
+        <div class="driveStates" style={{left:"124px", top:"180px"}}><DriveStateIcon stateName="D" currentState={this.state.driveState} /></div>
+        <div class="driveStates" style={{left:"134px", top:"235px"}}><DriveStateIcon stateName="P" currentState={this.state.driveState} /></div>
+        <div class="driveStates" style={{left:"160px", top:"280px"}}><DriveStateIcon stateName="B" currentState={this.state.driveState} /></div>
       </div>
     )
   }
