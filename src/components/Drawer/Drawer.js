@@ -10,11 +10,12 @@ export default class Drawer extends Component {
       speed : 0,
       count : 0,
     }
+    this.update = null;
   }
 
   componentWillReceiveProps(props) {
     this.setState({ speed : props.speedInput});
-    console.log(' receive:' + this.state.speed);
+    this.update();
   }
 
   componentDidMount() {
@@ -32,7 +33,8 @@ export default class Drawer extends Component {
     var limitAngle = limit / 100 * (endAngle - startAngle) + startAngle;
     console.log(" a " + limitAngle);
 
-    // back arc
+    // Arc rail of the speed indicator (the grey arc)
+    // The arc rail before the speed limit
     var rail1 = d3.svg.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
@@ -48,6 +50,7 @@ export default class Drawer extends Component {
         filter: 'url(#shadow)'
     });
 
+    // The arc rail after the speed limit
     var rail2 = d3.svg.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
@@ -56,7 +59,7 @@ export default class Drawer extends Component {
       .endAngle(function(d) { return d.endAngle; });
 
     var steps = 3;
-    var rail2Angle = (endAngle - limitAngle) * 180 / Math.PI; // ~~ 90
+    var rail2Angle = (endAngle - limitAngle) * 180 / Math.PI;
     var fadeStart = 40;
     var fadeStep = 0.0012;
     var data = d3.range(rail2Angle / steps).map(function(d, i) {
@@ -80,10 +83,10 @@ export default class Drawer extends Component {
       .attr("stroke", function(d) { return d.fill;})
       .attr("fill", function(d) { return d.fill; });
 
-    // fan shade
+    // Shadow fan of the speed indicator
     var fanStep = 3;
     var fanRange = 30;
-    var percentAngle = startAngle + (this.state.speed - 0.2) / 100 * (endAngle - startAngle);
+    var percentAngle = startAngle + (this.state.speed + 0.8) / 100 * (endAngle - startAngle);
     var fan = d3.svg.arc()
       .innerRadius(innerRadius * 0.7)
       .outerRadius(innerRadius)
@@ -114,12 +117,12 @@ export default class Drawer extends Component {
     }
     drawFan();
 
-    // arc
+    // The speed indicator arc
     var arcLine = d3.svg.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
       .cornerRadius(3)
-      .startAngle(startAngle).endAngle(startAngle + this.state.speed / 100 * (endAngle - startAngle));
+      .startAngle(startAngle).endAngle(startAngle + (this.state.speed + 1) / 100 * (endAngle - startAngle));
 
     var drawSpeedIndct = () => {
 
@@ -136,24 +139,20 @@ export default class Drawer extends Component {
     }
     drawSpeedIndct();
 
-    var update = () => {
-      this.setState({count : this.state.count + 1});
-
-      if (this.state.speed < 100) {
-        this.setState({ speed : this.state.speed + 0.5 });
-
-        var angle = startAngle + this.state.speed / 100 * (endAngle - startAngle);
+    this.update = () => {
+      if (this.state.speed <= 100 && this.state.speed >= 0) {
+        var angle = startAngle + (this.state.speed + 1) / 100 * (endAngle - startAngle);
         d3.select('#svg-g').selectAll("path").remove();
         arcLine.endAngle(angle);
         drawSpeedIndct();
 
         d3.select('#svg-fan').selectAll("path").remove();
-        percentAngle = startAngle + (this.state.speed - 0.2) / 100 * (endAngle - startAngle);
+        percentAngle = startAngle + (this.state.speed + 0.8) / 100 * (endAngle - startAngle);
         drawFan();
       }
       
       // console.log("update " + this.state.count);
-      window.requestAnimationFrame(update);
+      //window.requestAnimationFrame(self.update);
     }
     //update();
   }
