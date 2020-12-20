@@ -170,21 +170,36 @@ export default class SpeedIndicator extends Component {
   }
 
   render() {
-
+    const chartW = 800;
+    let transformStr = "translate(400,250)";
     return (
       <div id='chart'>
-        <svg width="700" height="400">
-          <g transform="translate(350,200)" id="svg-back">
-
+        <svg width="800" height="450">
+          <g transform={transformStr} id="labelCont">
+            <polyline points="-380, -210, 380, -210" style={{stroke:"grey", strokeWidth:0.7}} />
+            <text class="topText" transform="translate(-380, -219)" text-anchor="start" >Speedometer at {Math.round(this.state.speed)} mph</text>
+            <polyline points="-220, -160, -70, -160, -70, -140" style={{stroke:"grey", strokeWidth:1, strokeDasharray:"2,2"}} />
+            <text class="labelText" transform="translate(-310,-157)">SPEED INDICATOR</text>
+            <polyline points="240, -160, 100, -160, 100, -125" style={{stroke:"grey", strokeWidth:1, strokeDasharray:"2,2"}} />
+            <text class="labelText" transform="translate(360,-157)" text-anchor="end" >SPEED LIMIT INDICATOR</text>
+            <polyline points="-220, 160, -170, 160, -170, 130" style={{stroke:"grey", strokeWidth:1, strokeDasharray:"2,2"}} />
+            <text class="labelText" transform="translate(-230,163)" text-anchor="end" >DRIVE STATE INDICATOR</text>
+            <polyline points="0, 130, 0, 160, 218, 160" style={{stroke:"grey", strokeWidth:1, strokeDasharray:"2,2"}} />
+            <text class="labelText" transform="translate(360,160)" text-anchor="end" >FUEL EFFICIENCY INDICATOR</text>
+            <rect x="-70" y="80" width="140" height="2" style={{strokeWidth:0,fill:"url(#linearFill)" }} />
           </g>
-          <g transform="translate(350,200)" id="svg-fan">
-
-          </g>
-          <g transform="translate(350,200)" id="svg-g">
+          <g transform={transformStr} id="svg-back"/>
+          <g transform={transformStr} id="svg-fan"/>
+          <g transform={transformStr} id="svg-g">
             <defs>
               <filter id="shadow">
                 <feDropShadow dx="2" dy="2" stdDeviation="10"/>
               </filter>
+              <linearGradient id="linearFill" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stop-color="white" stop-opacity="0"/>
+                <stop offset="50%" stop-color="white" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="white" stop-opacity="0"/>
+              </linearGradient>
               <radialGradient id="grayGradient" x2="0%" y2="100%">
                 <stop offset="0%" stop-color="#1d1f20"></stop>
                 <stop offset="100%" stop-color="#1d1f20"></stop>
@@ -236,18 +251,17 @@ export default class SpeedIndicator extends Component {
             </defs>
             <circle r="25" id="glowMarker" fill="#ffe063" filter="url(#softGlow)" display="none"></circle>
             <text class="counterText" text-anchor="middle" alignment-baseline="middle">{Math.round(this.state.speed)}</text>
-            <text class="tipText" text-anchor="middle" alignment-baseline="middle">MPH</text>
+            <text class="mphText" text-anchor="middle" alignment-baseline="middle">MPH</text>
           </g>
-          <g id="driveStateCont">
-            
-          </g>
-          
         </svg>
-        <div class="driveStates" style={{left:"160px", top:"80px"}}><DriveStateIcon stateName="R" currentState={this.state.driveState} /></div>
-        <div class="driveStates" style={{left:"134px", top:"125px"}}><DriveStateIcon stateName="N" currentState={this.state.driveState} /></div>
-        <div class="driveStates" style={{left:"124px", top:"180px"}}><DriveStateIcon stateName="D" currentState={this.state.driveState} /></div>
-        <div class="driveStates" style={{left:"134px", top:"235px"}}><DriveStateIcon stateName="P" currentState={this.state.driveState} /></div>
-        <div class="driveStates" style={{left:"160px", top:"280px"}}><DriveStateIcon stateName="B" currentState={this.state.driveState} /></div>
+        <div id="driveCont" style={{left:"400px", top:"250px"}}>
+          <p style={{position: "absolute", width:"200px", left:"-46px", top:"76px", color:"white", fontSize: "16px"}}>🍃 <span style={{fontSize: "25px", fontWeight: "500"}}>34</span> MPG</p>
+          <div class="driveStates" style={{left:"-190px", top:"-120px"}}><DriveStateIcon stateName="R" currentState={this.state.driveState} /></div>
+          <div class="driveStates" style={{left:"-216px", top:"-75px"}}><DriveStateIcon stateName="N" currentState={this.state.driveState} /></div>
+          <div class="driveStates" style={{left:"-226px", top:"-20px"}}><DriveStateIcon stateName="D" currentState={this.state.driveState} /></div>
+          <div class="driveStates" style={{left:"-216px", top:"35px"}}><DriveStateIcon stateName="P" currentState={this.state.driveState} /></div>
+          <div class="driveStates" style={{left:"-190px", top:"80px"}}><DriveStateIcon stateName="B" currentState={this.state.driveState} /></div>
+        </div>
       </div>
     )
   }
