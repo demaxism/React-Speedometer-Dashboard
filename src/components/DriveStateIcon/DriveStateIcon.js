@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './DriveStateIcon.css';
-let d3 = window.d3;
 
 export default class DriveStateIcon extends Component {
 
@@ -14,10 +13,10 @@ export default class DriveStateIcon extends Component {
   }
 
   componentWillReceiveProps(props) {
-    let driveStateMap = {
+    const driveStateMap = {
       0: "R", 1: "N", 2: "D", 3: "P", 4: "B"
     }
-    let stateChar = driveStateMap[props.currentState];
+    const stateChar = driveStateMap[props.currentState];
 
     if (this.state.stateName === stateChar) {
       this.setState({ isEnabled : true});
@@ -28,13 +27,7 @@ export default class DriveStateIcon extends Component {
   }
 
   render() {
-    let showStyle;
-    if (this.state.isEnabled) {
-      showStyle = "driveState selected";
-    }
-    else {
-      showStyle = "driveState unselected";
-    }
+    const showStyle = this.state.isEnabled ? "driveState selected" : "driveState unselected";
     return (
       <div id="stateIcon" class={showStyle}>{this.state.stateName}</div>
     )

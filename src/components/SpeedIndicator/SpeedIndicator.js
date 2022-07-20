@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './SpeedIndicator.css';
 import '../DriveStateIcon/DriveStateIcon';
 import DriveStateIcon from '../DriveStateIcon/DriveStateIcon';
-let d3 = window.d3;
+const d3 = window.d3;
 
 export default class SpeedIndicator extends Component {
 
@@ -24,7 +24,7 @@ export default class SpeedIndicator extends Component {
 
   componentDidMount() {
 
-    let self = this;
+    const self = this;
 
     const limit = 65; // speed limit of 65 MPH
     const outerRadius=150;
@@ -37,7 +37,7 @@ export default class SpeedIndicator extends Component {
 
     // Arc rail of the speed indicator (the grey arc)
     // The arc rail before the speed limit
-    var rail1 = d3.svg.arc()
+    const rail1 = d3.svg.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
       .cornerRadius(0)
@@ -53,18 +53,18 @@ export default class SpeedIndicator extends Component {
     });
 
     // The arc rail after the speed limit
-    var rail2 = d3.svg.arc()
+    const rail2 = d3.svg.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
       .cornerRadius(0)
       .startAngle(function(d) { return d.startAngle; })
       .endAngle(function(d) { return d.endAngle; });
 
-    var steps = 3;
-    var rail2Angle = (endAngle - limitAngle) * 180 / Math.PI;
-    var fadeStart = 40;
-    var fadeStep = 0.0012;
-    var data = d3.range(rail2Angle / steps).map(function(d, i) {
+    const steps = 3;
+    const rail2Angle = (endAngle - limitAngle) * 180 / Math.PI;
+    const fadeStart = 40;
+    const fadeStep = 0.0012;
+    const data = d3.range(rail2Angle / steps).map(function(d, i) {
       var pass = i * steps;
       return {
         flag: i,
@@ -88,13 +88,13 @@ export default class SpeedIndicator extends Component {
     const fanStep = 3;
     const fanRange = 30;
     let percentAngle = startAngle + (this.state.speed + 0.8) / 100 * (endAngle - startAngle);
-    let fan = d3.svg.arc()
+    const fan = d3.svg.arc()
       .innerRadius(innerRadius * 0.7)
       .outerRadius(innerRadius)
       .startAngle(function(d) { return d.startAngle; })
       .endAngle(function(d) { return d.endAngle; });
 
-    let fanData = ()=> {
+    const fanData = ()=> {
       return d3.range(fanRange).map(function(d, i) {
         var pass = i * fanStep;
         var h = (self.state.speed < limit) ? 200 : 45;
@@ -106,7 +106,7 @@ export default class SpeedIndicator extends Component {
       });
     }
 
-    let drawFan = () => {
+    const drawFan = () => {
       d3.select('#svg-fan').selectAll("path")
       .data(fanData())
       .enter()
@@ -119,13 +119,13 @@ export default class SpeedIndicator extends Component {
     drawFan();
 
     // The speed indicator arc
-    let arcLine = d3.svg.arc()
+    const arcLine = d3.svg.arc()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius)
       .cornerRadius(3)
       .startAngle(startAngle).endAngle(startAngle + (this.state.speed + 1) / 100 * (endAngle - startAngle));
 
-    let drawSpeedIndct = () => {
+    const drawSpeedIndct = () => {
 
       d3.select('#svg-g').append('path')
       .datum({endAngle:0})
@@ -143,7 +143,7 @@ export default class SpeedIndicator extends Component {
     this.update = () => {
       if (this.state.speed <= 100 && this.state.speed >= 0) {
         // update speed indicator arc
-        let angle = startAngle + (this.state.speed + 1) / 100 * (endAngle - startAngle);
+        const angle = startAngle + (this.state.speed + 1) / 100 * (endAngle - startAngle);
         d3.select('#svg-g').selectAll("path").remove();
         arcLine.endAngle(angle);
         drawSpeedIndct();
@@ -154,15 +154,15 @@ export default class SpeedIndicator extends Component {
         drawFan();
 
         // update highlight
-        let marker = d3.select('#glowMarker');
+        const marker = d3.select('#glowMarker');
         if (this.state.speed < limit) {
           marker.attr('display', "none");
         }
         else {
           marker.attr('display', "block");
-          let r = (innerRadius + outerRadius) / 2.0;
-          let x = r * Math.sin(angle);
-          let y = -r * Math.cos(angle);
+          const r = (innerRadius + outerRadius) / 2.0;
+          const x = r * Math.sin(angle);
+          const y = -r * Math.cos(angle);
           marker.attr('transform', `translate(${x}, ${y})`);
         }
       }
@@ -170,7 +170,6 @@ export default class SpeedIndicator extends Component {
   }
 
   render() {
-    const chartW = 800;
     let transformStr = "translate(400,250)";
     return (
       <div id='chart'>
