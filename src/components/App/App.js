@@ -38,8 +38,8 @@ export default class App extends Component {
       } // down arrow
     });
 
-    var update = () => {
-      let acc = 0.5;
+    const update = () => {
+      const acc = 0.5;
       if (this.state.isAcc) {
         if (this.state.speed < 100) {
           this.setState({ speed : this.state.speed + acc});
